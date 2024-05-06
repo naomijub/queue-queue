@@ -222,4 +222,18 @@ mod tests {
         assert_eq!(new_prio.dequeue(), Some((2, "hello wow".to_string())));
         assert_eq!(new_prio.dequeue(), Some((1, "world wow".to_string())));
     }
+
+    #[test]
+    fn node_order() {
+        let node1 = Node {
+            priority: 3,
+            data: "hello".to_string(),
+        };
+        let node2 = Node {
+            priority: 2,
+            data: "julia".to_string(),
+        };
+
+        assert!(node1 > node2);
+    }
 }
