@@ -8,6 +8,7 @@ keywords = ["priority-queue", "queue"]
 categories = ["data-strucutures"]
 repository = "https://github.com/naomijub/prioq"
 homepage = "https://github.com/naomijub/prioq"
+description = "A priority queue implementation based on Rust's BinaryHeap"
 
 [dependencies]
 
