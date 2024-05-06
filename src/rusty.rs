@@ -66,7 +66,10 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> PriorityQueue<P, T>
 impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> RustyPriorityQueue<P, T> {
     #[must_use]
     pub const fn iter(&self) -> RustyPriorityQueueIterator<P, T> {
-        RustyPriorityQueueIterator { queue: &self.queue }
+        RustyPriorityQueueIterator {
+            internal: &self.queue,
+            index: 0,
+        }
     }
 
     #[must_use]
@@ -77,7 +80,8 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> RustyPriorityQueue<P, T>
 
 /// An Iterator struct for `RustyPriorityQueue`
 pub struct RustyPriorityQueueIterator<'b, P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> {
-    queue: &'b BinaryHeap<Node<P, T>>,
+    internal: &'b BinaryHeap<Node<P, T>>,
+    index: usize,
 }
 
 impl<'b, P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> Iterator
@@ -86,7 +90,13 @@ impl<'b, P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> Iterator
     type Item = (&'b P, &'b T);
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.queue.iter().next().map(|n| (&n.priority, &n.data))
+        let val = self
+            .internal
+            .iter()
+            .nth(self.index)
+            .map(|n| (&n.priority, &n.data));
+        self.index += 1;
+        val
     }
 }
 
@@ -154,9 +164,9 @@ mod tests {
     fn enqueue_once_has_size_1() {
         let mut prio = RustyPriorityQueue::<usize, String>::default();
 
-        prio.enqueue(3, String::from("hellow world"));
+        prio.enqueue(3, String::from("hello world"));
         assert_eq!(prio.len(), 1);
-        assert_eq!(prio.peek(), Some((&3, &String::from("hellow world"))));
+        assert_eq!(prio.peek(), Some((&3, &String::from("hello world"))));
     }
 
     #[test]
@@ -185,7 +195,7 @@ mod tests {
 
         let mut new_prio: RustyPriorityQueue<usize, String> = prio
             .iter()
-            .map(|(priority, data)| (*priority, data.to_owned() + " wow"))
+            .map(|(priority, data)| (*priority, data.clone() + " wow"))
             .collect();
 
         assert_eq!(new_prio.dequeue(), Some((3, "julia wow".to_string())));
