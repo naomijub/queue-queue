@@ -64,10 +64,12 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> PriorityQueue<P, T>
 }
 
 impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> RustyPriorityQueue<P, T> {
+    #[must_use]
     pub const fn iter(&self) -> RustyPriorityQueueIterator<P, T> {
         RustyPriorityQueueIterator { queue: &self.queue }
     }
 
+    #[must_use]
     pub fn into_iter(self) -> RustyPriorityQueueIntoIterator<P, T> {
         RustyPriorityQueueIntoIterator { queue: self.queue }
     }
@@ -102,7 +104,7 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> FromIterator<(P, T)>
     }
 }
 
-/// An IntoIterator struct for `RustyPriorityQueue`
+/// An `IntoIterator` struct for `RustyPriorityQueue`
 pub struct RustyPriorityQueueIntoIterator<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> {
     queue: BinaryHeap<Node<P, T>>,
 }
@@ -123,6 +125,16 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> IntoIterator for RustyPr
 
     fn into_iter(self) -> Self::IntoIter {
         RustyPriorityQueueIntoIterator { queue: self.queue }
+    }
+}
+
+impl<'b, P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> IntoIterator
+    for &'b RustyPriorityQueue<P, T>
+{
+    type IntoIter = RustyPriorityQueueIterator<'b, P, T>;
+    type Item = (&'b P, &'b T);
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 
