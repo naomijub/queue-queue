@@ -1,13 +1,13 @@
 [package]
-name = "prioq"
+name = "queue-queue"
 version = "0.0.1"
 edition = "2021"
 license = "MIT"
 authors = ["Julia Naomi <jnboeira@outlook.com>"]
 keywords = ["priority-queue", "queue"]
 categories = ["data-strucutures"]
-repository = "https://github.com/naomijub/prioq"
-homepage = "https://github.com/naomijub/prioq"
+repository = "https://github.com/naomijub/queue-queue"
+homepage = "https://github.com/naomijub/queue-queue"
 description = "A priority queue implementation based on Rust's BinaryHeap"
 
 [dependencies]

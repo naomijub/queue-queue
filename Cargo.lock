@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "prioq"
+name = "queue-queue"
 version = "0.0.1"
