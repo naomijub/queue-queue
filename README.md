@@ -2,4 +2,4 @@
 
 > Name inspired by the sound birds make "cuckoo"
 
-A simple priority queue crate that supports defining the prority of an element.
+A simple priority queue crate that supports defining the prority of an element with zero default dependencies.
