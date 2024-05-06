@@ -14,6 +14,7 @@ homepage = "https://github.com/naomijub/prioq"
 [lints.clippy]
 nursery = { level = "deny", priority = -1 }
 all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
 
 should_implement_trait = { level = "allow", priority = 1 }
 non_canonical_partial_ord_impl = { level = "allow", priority = 1 }
