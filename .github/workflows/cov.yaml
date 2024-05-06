@@ -29,4 +29,5 @@ jobs:
       with:
         files: lcov.info
         token: ${{ secrets.CODECOV_TOKEN }}
+        slug: naomijub/queue-queue
         fail_ci_if_error: true
