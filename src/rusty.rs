@@ -70,6 +70,12 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> Default for RustyPriorit
 impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> PriorityQueue<P, T>
     for RustyPriorityQueue<P, T>
 {
+    fn with_capacity(capacity: usize) -> Self {
+        Self {
+            queue: BinaryHeap::with_capacity(capacity),
+        }
+    }
+
     fn enqueue(&mut self, priority: P, data: T) {
         let node = Node { priority, data };
 
@@ -92,6 +98,62 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> PriorityQueue<P, T>
 
     fn is_empty(&self) -> bool {
         self.queue.is_empty()
+    }
+
+    fn capacity(&self) -> usize {
+        self.queue.capacity()
+    }
+
+    fn append(&mut self, mut other: Self) {
+        self.queue.append(&mut other.queue);
+    }
+
+    /// Extend the priority queue with an iterator
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use queue_queue::rusty::RustyPriorityQueue;
+    /// # use queue_queue::PriorityQueue;
+    ///
+    /// let mut prio = RustyPriorityQueue::<usize, String>::default();
+    /// prio.extend(vec![(2, "world".to_string()), (3, "hello".to_string())]);
+    /// assert_eq!(prio.dequeue(), Some((3, "hello".to_string())));
+    /// assert_eq!(prio.dequeue(), Some((2, "world".to_string())));
+    /// assert_eq!(prio.dequeue(), None);
+    /// ```
+    fn extend<I>(&mut self, iter: I)
+    where
+        I: IntoIterator<Item = (P, T)>,
+    {
+        self.queue.extend(iter.into_iter().map(|(x, y)| Node {
+            priority: x,
+            data: y,
+        }));
+    }
+
+    fn reserve(&mut self, additional: usize) {
+        self.queue.reserve(additional);
+    }
+
+    fn reserve_exact(&mut self, additional: usize) {
+        self.queue.reserve_exact(additional);
+    }
+
+    fn shrink_to_fit(&mut self) {
+        self.queue.shrink_to_fit();
+    }
+
+    fn shrink_to(&mut self, capacity: usize) {
+        self.queue.shrink_to(capacity);
+    }
+
+    fn clear(&mut self) {
+        self.queue.clear();
+    }
+
+    fn drain(&mut self) -> impl Iterator<Item = (P, T)> + '_ {
+        self.queue.drain().map(|n| (n.priority, n.data))
     }
 }
 
@@ -269,5 +331,74 @@ mod tests {
         };
 
         assert!(node1 > node2);
+    }
+
+    #[test]
+    fn queue_with_capacity() {
+        let prio = RustyPriorityQueue::<usize, String>::with_capacity(10);
+        assert_eq!(prio.len(), 0);
+        assert!(prio.is_empty());
+        assert_eq!(prio.capacity(), 10);
+
+        let default_prio = RustyPriorityQueue::<usize, String>::default();
+        assert_eq!(default_prio.len(), 0);
+        assert!(default_prio.is_empty());
+        assert_eq!(default_prio.capacity(), 0);
+    }
+
+    #[test]
+    fn appends_into_queue() {
+        let mut prio = RustyPriorityQueue::<usize, &str>::default();
+        assert_eq!(prio.len(), 0);
+        prio.extend([(2, "hello"), (3, "julia"), (1, "world"), (3, "naomi")]);
+        assert_eq!(prio.len(), 4);
+
+        let mut append_prio = RustyPriorityQueue::<usize, &str>::default();
+        assert_eq!(append_prio.len(), 0);
+        append_prio.append(prio);
+        assert_eq!(append_prio.len(), 4);
+
+        assert_eq!(append_prio.dequeue(), Some((3, "julia")));
+    }
+
+    #[test]
+    fn capacity_management() {
+        let mut prio = RustyPriorityQueue::<usize, &str>::default();
+        assert_eq!(prio.capacity(), 0);
+        prio.reserve(3);
+        assert_eq!(prio.capacity(), 4);
+        prio.shrink_to_fit();
+        assert_eq!(prio.capacity(), 0);
+        prio.reserve_exact(3);
+        assert_eq!(prio.capacity(), 3);
+        prio.shrink_to(2);
+        assert_eq!(prio.capacity(), 2);
+    }
+
+    #[test]
+    fn clears_queue() {
+        let mut prio = RustyPriorityQueue::<usize, String>::default();
+        prio.enqueue(2, "hello".to_string());
+        prio.enqueue(3, "julia".to_string());
+        prio.enqueue(1, "world".to_string());
+        prio.enqueue(3, "naomi".to_string());
+
+        assert_eq!(prio.len(), 4);
+        prio.clear();
+        assert_eq!(prio.len(), 0);
+    }
+
+    #[test]
+    fn drain_queue() {
+        let mut prio = RustyPriorityQueue::<usize, String>::default();
+        prio.enqueue(2, "hello".to_string());
+
+        assert!(!prio.is_empty());
+
+        for x in prio.drain() {
+            assert_eq!(x, (2, "hello".to_string()));
+        }
+
+        assert!(prio.is_empty());
     }
 }
