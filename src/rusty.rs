@@ -151,6 +151,10 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> PriorityQueue<P, T>
     fn clear(&mut self) {
         self.queue.clear();
     }
+
+    fn drain(&mut self) -> impl Iterator<Item = (P, T)> + '_ {
+        self.queue.drain().map(|n| (n.priority, n.data))
+    }
 }
 
 impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> RustyPriorityQueue<P, T> {
@@ -382,5 +386,19 @@ mod tests {
         assert_eq!(prio.len(), 4);
         prio.clear();
         assert_eq!(prio.len(), 0);
+    }
+
+    #[test]
+    fn drain_queue() {
+        let mut prio = RustyPriorityQueue::<usize, String>::default();
+        prio.enqueue(2, "hello".to_string());
+
+        assert!(!prio.is_empty());
+
+        for x in prio.drain() {
+            assert_eq!(x, (2, "hello".to_string()));
+        }
+
+        assert!(prio.is_empty());
     }
 }

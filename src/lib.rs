@@ -65,6 +65,34 @@ pub trait PriorityQueue<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> {
 
     /// Removes all items from the queue
     fn clear(&mut self);
+
+    /// Clears the binary heap, returning an iterator over the removed elements
+    /// in arbitrary order. If the iterator is dropped before being fully
+    /// consumed, it drops the remaining elements in arbitrary order.
+    ///
+    /// The returned iterator keeps a mutable borrow on the heap to optimize
+    /// its implementation.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// # use queue_queue::rusty::RustyPriorityQueue;
+    /// # use queue_queue::PriorityQueue;
+    ///
+    /// let mut prio = RustyPriorityQueue::<usize, String>::default();
+    /// prio.enqueue(2, "hello".to_string());
+    ///
+    /// assert!(!prio.is_empty());
+    ///
+    /// for x in prio.drain() {
+    ///     println!("{x:?}");
+    /// }
+    ///
+    /// assert!(prio.is_empty());
+    /// ```
+    fn drain(&mut self) -> impl Iterator<Item = (P, T)> + '_;
 }
 
 pub mod prelude {
