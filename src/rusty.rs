@@ -23,6 +23,38 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> Ord for Node<P, T> {
 }
 
 #[derive(Debug)]
+/// A priority queue implementation based on Rust's `BinaryHeap`.
+/// Templated with `P` for priority and `T` for data.
+///
+/// - `P` must be `PartialOrd`, `PartialEq`, and `Eq`.
+/// - `T` must be `PartialEq` and `Eq`.
+///
+/// If Node A and Node B have the same priority, but Node A was added before Node B,
+/// then Node A will be prioritized over Node B.
+/// See [`PriorityQueue`](trait.PriorityQueue.html) for more information.
+///
+/// # Examples
+///
+/// ```rust
+/// # use queue_queue::rusty::RustyPriorityQueue;
+/// # use queue_queue::PriorityQueue;
+///
+/// let mut prio = RustyPriorityQueue::<usize, String>::default();
+/// prio.enqueue(2, "hello".to_string());
+/// prio.enqueue(3, "julia".to_string());
+/// prio.enqueue(1, "world".to_string());
+/// prio.enqueue(3, "naomi".to_string());
+///
+/// let mut new_prio: RustyPriorityQueue<usize, String> = prio
+///     .into_iter()
+///     .map(|(priority, data)| (priority, data.to_owned() + " wow"))
+///     .collect();
+///
+/// assert_eq!(new_prio.dequeue(), Some((3, "julia wow".to_string())));
+/// assert_eq!(new_prio.dequeue(), Some((3, "naomi wow".to_string())));
+/// assert_eq!(new_prio.dequeue(), Some((2, "hello wow".to_string())));
+/// assert_eq!(new_prio.dequeue(), Some((1, "world wow".to_string())));
+/// ```
 pub struct RustyPriorityQueue<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> {
     queue: BinaryHeap<Node<P, T>>,
 }
@@ -65,6 +97,7 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> PriorityQueue<P, T>
 
 impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> RustyPriorityQueue<P, T> {
     #[must_use]
+    /// Get an iterator over the priority queue
     pub const fn iter(&self) -> RustyPriorityQueueIterator<P, T> {
         RustyPriorityQueueIterator {
             internal: &self.queue,
@@ -73,6 +106,7 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> RustyPriorityQueue<P, T>
     }
 
     #[must_use]
+    /// Convert the priority queue into an iterator
     pub fn into_iter(self) -> RustyPriorityQueueIntoIterator<P, T> {
         RustyPriorityQueueIntoIterator { queue: self.queue }
     }
