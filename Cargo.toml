@@ -1,6 +1,6 @@
 [package]
 name = "queue-queue"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2021"
 license = "MIT"
 authors = ["Julia Naomi <jnboeira@outlook.com>"]
@@ -12,6 +12,9 @@ description = "A priority queue implementation based on Rust's BinaryHeap"
 
 [dependencies]
 
+[dev-dependencies]
+criterion = { version = "0.4", features = ["html_reports"] }
+
 [lints.clippy]
 nursery = { level = "deny", priority = -1 }
 all = { level = "deny", priority = -1 }
@@ -20,3 +23,7 @@ pedantic = { level = "deny", priority = -1 }
 should_implement_trait = { level = "allow", priority = 1 }
 non_canonical_partial_ord_impl = { level = "allow", priority = 1 }
 module_name_repetitions = { level = "allow", priority = 1 }
+
+[[bench]]
+name = "rusty"
+harness = false
