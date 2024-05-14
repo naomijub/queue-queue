@@ -2,7 +2,7 @@ use std::{cmp::Ordering, collections::BinaryHeap};
 
 use crate::PriorityQueue;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct Node<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> {
     priority: P,
     data: T,
@@ -154,6 +154,38 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> PriorityQueue<P, T>
 
     fn drain(&mut self) -> impl Iterator<Item = (P, T)> + '_ {
         self.queue.drain().map(|n| (n.priority, n.data))
+    }
+
+    fn contains(&self, data: &T) -> bool {
+        self.queue.iter().any(|node| &node.data == data)
+    }
+
+    fn contains_at(&self, priority: &P, data: &T) -> bool {
+        self.queue
+            .iter()
+            .any(|node| &node.data == data && &node.priority == priority)
+    }
+
+    fn remove(&mut self, data: &T) -> bool {
+        let original_size = self.queue.len();
+        self.queue.retain(|node| &node.data != data);
+        let new_size = self.queue.len();
+
+        original_size != new_size
+    }
+
+    fn remove_at(&mut self, priority: &P, data: &T) -> bool {
+        let original_size = self.queue.len();
+        self.queue.retain(|node| {
+            if &node.priority == priority {
+                &node.data != data
+            } else {
+                true
+            }
+        });
+        let new_size = self.queue.len();
+
+        original_size != new_size
     }
 }
 
@@ -308,10 +340,23 @@ mod tests {
         prio.enqueue(1, "world".to_string());
         prio.enqueue(3, "naomi".to_string());
 
+        let ref_str = "julia".to_string();
+        assert!(prio.contains(&ref_str));
+        assert!(prio.contains_at(&3, &ref_str));
+        assert!(!prio.contains_at(&2, &ref_str));
+
         let mut new_prio: RustyPriorityQueue<usize, String> = prio
             .into_iter()
             .map(|(priority, data)| (priority, data.to_owned() + " wow"))
             .collect();
+
+        let new_ref_str = "julia wow".to_string();
+        assert!(!new_prio.contains(&ref_str));
+        assert!(!new_prio.contains_at(&3, &ref_str));
+        assert!(!new_prio.contains_at(&2, &ref_str));
+        assert!(new_prio.contains(&new_ref_str));
+        assert!(new_prio.contains_at(&3, &new_ref_str));
+        assert!(!new_prio.contains_at(&2, &new_ref_str));
 
         assert_eq!(new_prio.dequeue(), Some((3, "julia wow".to_string())));
         assert_eq!(new_prio.dequeue(), Some((3, "naomi wow".to_string())));
@@ -400,5 +445,41 @@ mod tests {
         }
 
         assert!(prio.is_empty());
+    }
+
+    #[test]
+    fn remove_node() {
+        let mut prio = RustyPriorityQueue::<usize, String>::default();
+        prio.enqueue(5, "julia".to_string());
+        prio.enqueue(2, "hello".to_string());
+        prio.enqueue(3, "julia".to_string());
+        prio.enqueue(1, "world".to_string());
+        prio.enqueue(3, "naomi".to_string());
+
+        let ref_str = "julia".to_string();
+        assert!(prio.remove(&ref_str));
+
+        // assert_eq!(prio.dequeue(), Some((3, "julia".to_string())));
+        assert_eq!(prio.dequeue(), Some((3, "naomi".to_string())));
+        assert_eq!(prio.dequeue(), Some((2, "hello".to_string())));
+        assert_eq!(prio.dequeue(), Some((1, "world".to_string())));
+    }
+
+    #[test]
+    fn remove_node_at_prio() {
+        let mut prio = RustyPriorityQueue::<usize, String>::default();
+        prio.enqueue(5, "julia".to_string());
+        prio.enqueue(2, "hello".to_string());
+        prio.enqueue(3, "julia".to_string());
+        prio.enqueue(1, "world".to_string());
+        prio.enqueue(3, "naomi".to_string());
+
+        let ref_str = "julia".to_string();
+        assert!(prio.remove_at(&3, &ref_str));
+
+        assert_eq!(prio.dequeue(), Some((5, "julia".to_string())));
+        assert_eq!(prio.dequeue(), Some((3, "naomi".to_string())));
+        assert_eq!(prio.dequeue(), Some((2, "hello".to_string())));
+        assert_eq!(prio.dequeue(), Some((1, "world".to_string())));
     }
 }

@@ -19,6 +19,22 @@ pub trait PriorityQueue<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> {
     /// Queue capacity
     fn capacity(&self) -> usize;
 
+    /// Check if an item exists in the queue
+    /// true if it exists, false if it does not
+    fn contains(&self, data: &T) -> bool;
+
+    /// Check if an item exists in the queue at a certain priority
+    /// true if it exists, false if it does not
+    fn contains_at(&self, priority: &P, data: &T) -> bool;
+
+    /// Remove all existing items from the queue
+    /// true if it was removed, false if it was not
+    fn remove(&mut self, data: &T) -> bool;
+
+    /// Remove an item from the queue if exists at a certain priority
+    /// true if it was removed, false if it was not
+    fn remove_at(&mut self, priority: &P, data: &T) -> bool;
+
     /// Create a new priority queue with a given capacity
     ///
     /// # Example:
