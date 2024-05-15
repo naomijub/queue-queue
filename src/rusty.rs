@@ -204,6 +204,49 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> RustyPriorityQueue<P, T>
     pub fn into_iter(self) -> RustyPriorityQueueIntoIterator<P, T> {
         RustyPriorityQueueIntoIterator { queue: self.queue }
     }
+
+    /// Update the priority of an item in the queue.
+    ///
+    /// > This is a very slow operation!
+    /// > * it uses unsafe `std::mem::transmute_copy` under the hhod to guarantee allocation of priority `P` on every possible scenario.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use queue_queue::rusty::RustyPriorityQueue;
+    /// # use queue_queue::PriorityQueue;
+    ///
+    /// let mut prio = RustyPriorityQueue::<usize, String>::default();
+    /// prio.enqueue(5, "julia".to_string());
+    /// prio.enqueue(2, "hello".to_string());
+    /// prio.enqueue(3, "julia".to_string());
+    /// prio.enqueue(1, "world".to_string());
+    /// prio.enqueue(3, "naomi".to_string());
+
+    /// let ref_str = "julia".to_string();
+    /// let mut new = prio.update(3, 7,&ref_str);
+
+    /// assert_eq!(new.dequeue(), Some((7, "julia".to_string())));
+    /// assert_eq!(new.dequeue(), Some((5, "julia".to_string())));
+    /// assert_eq!(new.dequeue(), Some((3, "naomi".to_string())));
+    /// assert_eq!(new.dequeue(), Some((2, "hello".to_string())));
+    /// assert_eq!(new.dequeue(), Some((1, "world".to_string())));
+    /// ```
+    #[must_use]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn update(mut self, old: P, new: P, data: &T) -> Self {
+        self.queue
+            .drain()
+            .map(|n| {
+                if n.priority == old && &n.data == data {
+                    let copy: P = unsafe { std::mem::transmute_copy(&new) };
+                    (copy, n.data)
+                } else {
+                    (n.priority, n.data)
+                }
+            })
+            .collect()
+    }
 }
 
 /// An Iterator struct for `RustyPriorityQueue`
@@ -481,5 +524,24 @@ mod tests {
         assert_eq!(prio.dequeue(), Some((3, "naomi".to_string())));
         assert_eq!(prio.dequeue(), Some((2, "hello".to_string())));
         assert_eq!(prio.dequeue(), Some((1, "world".to_string())));
+    }
+
+    #[test]
+    fn update() {
+        let mut prio = RustyPriorityQueue::<usize, String>::default();
+        prio.enqueue(5, "julia".to_string());
+        prio.enqueue(2, "hello".to_string());
+        prio.enqueue(3, "julia".to_string());
+        prio.enqueue(1, "world".to_string());
+        prio.enqueue(3, "naomi".to_string());
+
+        let ref_str = "julia".to_string();
+        let mut new = prio.update(3, 7, &ref_str);
+
+        assert_eq!(new.dequeue(), Some((7, "julia".to_string())));
+        assert_eq!(new.dequeue(), Some((5, "julia".to_string())));
+        assert_eq!(new.dequeue(), Some((3, "naomi".to_string())));
+        assert_eq!(new.dequeue(), Some((2, "hello".to_string())));
+        assert_eq!(new.dequeue(), Some((1, "world".to_string())));
     }
 }
