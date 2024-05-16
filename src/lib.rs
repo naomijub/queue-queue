@@ -109,6 +109,14 @@ pub trait PriorityQueue<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> {
     /// assert!(prio.is_empty());
     /// ```
     fn drain(&mut self) -> impl Iterator<Item = (P, T)> + '_;
+
+    /// Returns the node the the highest priority in the queue.
+    /// If no nodes exist, `None` is returned.
+    fn max_node(&self) -> Option<(&P, &T)>;
+
+    /// Returns the node the the lowest priority in the queue.
+    /// If no nodes exist, `None` is returned.
+    fn min_node(&self) -> Option<(&P, &T)>;
 }
 
 pub mod prelude {

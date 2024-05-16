@@ -187,6 +187,28 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> PriorityQueue<P, T>
 
         original_size != new_size
     }
+
+    fn max_node(&self) -> Option<(&P, &T)> {
+        self.queue
+            .iter()
+            .max_by(|a, b| {
+                a.priority
+                    .partial_cmp(&b.priority)
+                    .unwrap_or(Ordering::Equal)
+            })
+            .map(|node| (&node.priority, &node.data))
+    }
+
+    fn min_node(&self) -> Option<(&P, &T)> {
+        self.queue
+            .iter()
+            .min_by(|a, b| {
+                a.priority
+                    .partial_cmp(&b.priority)
+                    .unwrap_or(Ordering::Equal)
+            })
+            .map(|node| (&node.priority, &node.data))
+    }
 }
 
 impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> RustyPriorityQueue<P, T> {
@@ -543,5 +565,18 @@ mod tests {
         assert_eq!(new.dequeue(), Some((3, "naomi".to_string())));
         assert_eq!(new.dequeue(), Some((2, "hello".to_string())));
         assert_eq!(new.dequeue(), Some((1, "world".to_string())));
+    }
+
+    #[test]
+    fn min_max() {
+        let mut prio = RustyPriorityQueue::<usize, String>::default();
+        prio.enqueue(5, "julia".to_string());
+        prio.enqueue(2, "hello".to_string());
+        prio.enqueue(3, "julia".to_string());
+        prio.enqueue(1, "world".to_string());
+        prio.enqueue(3, "naomi".to_string());
+
+        assert_eq!(prio.max_node(), Some((&5, &"julia".to_string())));
+        assert_eq!(prio.min_node(), Some((&1, &"world".to_string())));
     }
 }
