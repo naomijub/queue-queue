@@ -13,6 +13,11 @@ fn main() {
         .collect();
 
     println!(
+        "{:?} == Some((1, \"world wow\".to_string()))",
+        new_prio.min_node()
+    );
+
+    println!(
         "{:?} == Some((3, \"julia wow\".to_string()))",
         new_prio.dequeue()
     );
