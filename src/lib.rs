@@ -1,4 +1,4 @@
-pub mod inverse_queue;
+pub mod inverse;
 pub mod rusty;
 
 pub trait PriorityQueue<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> {
@@ -122,6 +122,6 @@ pub trait PriorityQueue<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> {
 
 pub mod prelude {
     pub use super::PriorityQueue;
-    pub use crate::inverse_queue::InversePriorityQueue;
+    pub use crate::inverse::InversePriorityQueue;
     pub use crate::rusty::RustyPriorityQueue;
 }

@@ -9,4 +9,4 @@ A simple priority queue crate that supports defining the priority of an element 
 All priority queues implement the trait [`PriorityQueue`](https://docs.rs/queue-queue/latest/queue_queue/trait.PriorityQueue.html) from `prelude`, and the available queues are:
 
 - [`RustyPriorityQueue`](https://docs.rs/queue-queue/latest/queue_queue/rusty/struct.RustyPriorityQueue.html) which is based on top of Rust's [`BinaryHeap`](https://doc.rust-lang.org/std/collections/struct.BinaryHeap.html). Highest priority has the highest PartialOrd value.
-- [`InversePriorityQueue`](https://docs.rs/queue-queue/latest/queue_queue/inverse_queue/struct.InversePriorityQueue.html) which is based on top of Rust's [`BinaryHeap`](https://doc.rust-lang.org/std/collections/struct.BinaryHeap.html). Highest priority has the lowest PartialOrd value.
+- [`InversePriorityQueue`](https://docs.rs/queue-queue/latest/queue_queue/inverse/struct.InversePriorityQueue.html) which is based on top of Rust's [`BinaryHeap`](https://doc.rust-lang.org/std/collections/struct.BinaryHeap.html). Highest priority has the lowest PartialOrd value.
