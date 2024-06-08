@@ -270,6 +270,14 @@ impl<P: PartialOrd + PartialEq + Eq, T: PartialEq + Eq> InversePriorityQueue<P, 
             })
             .collect()
     }
+
+    /// Update the priority of an item in the queue with a reference to the data.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn update_as(&mut self, old: P, new: P, data: T) {
+        self.queue
+            .retain(|n| !(n.priority == old && n.data == data));
+        self.enqueue(new, data);
+    }
 }
 
 /// An Iterator struct for `InversePriorityQueue`
