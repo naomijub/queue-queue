@@ -587,4 +587,23 @@ mod tests {
         assert_eq!(prio.max_node(), Some((&5, &"julia".to_string())));
         assert_eq!(prio.min_node(), Some((&1, &"world".to_string())));
     }
+
+    #[test]
+    fn update_as() {
+        let mut prio = RustyPriorityQueue::<usize, String>::default();
+        prio.enqueue(5, "julia".to_string());
+        prio.enqueue(2, "hello".to_string());
+        prio.enqueue(3, "julia".to_string());
+        prio.enqueue(1, "world".to_string());
+        prio.enqueue(3, "naomi".to_string());
+
+        let ref_str = "julia".to_string();
+        prio.update_as(3, 7, ref_str);
+
+        assert_eq!(prio.dequeue(), Some((7, "julia".to_string())));
+        assert_eq!(prio.dequeue(), Some((5, "julia".to_string())));
+        assert_eq!(prio.dequeue(), Some((3, "naomi".to_string())));
+        assert_eq!(prio.dequeue(), Some((2, "hello".to_string())));
+        assert_eq!(prio.dequeue(), Some((1, "world".to_string())));
+    }
 }
